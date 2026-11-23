@@ -29,4 +29,12 @@ electrical, roofing and more). Filled in after research: see context/docs/resear
 - Log every change in this week's work log.
 
 ## Tools
-(filled in step 4)
+- **Claude Code** in VS Code, with **GitHub** (gh CLI) for version control.
+- **Clay** (Treford workspace): searches, enrichment, AI columns, routing. Rex (`tools/rex/`, unofficial) lets Claude work in it.
+- **HubSpot** (week 3), **n8n** (week 4), a sequencer for sending (Smartlead or Clay Sequencer; nothing is sent from here).
+- Free public data used for trade contractors: city permit portals, NOAA storm events, state licence boards, SBA loan data.
+- Skills (`.claude/skills/`, from Bolaji Anifowose's GTM starter kit, licences in THIRD-PARTY.md):
+  research to copy `/campaign-strategy` `/signal-matrix` `/build-workflow-spec` `/campaign-copy` `/miro-gtm-flowchart`;
+  Clay `/clay-build-plan` `/build-clay` `/prompt-builder` `/campaign-contract` `/design-clay-table-json` `/import-clay-table`
+  `/save-clay-schema` `/calculate-costs` `/workspace-cost-audit` `/export-tables` `/campaign-qa`;
+  research and sending `/crawl4ai` `/agent-browser` `/inbox-placement-test`.
