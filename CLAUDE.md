@@ -41,7 +41,8 @@ contractors with 10 to 99 employees, adding technicians or a location, still on 
 
 ## Tools
 - **Claude Code** in VS Code, with **GitHub** (gh CLI) for version control.
-- **Clay** (Treford workspace): searches, enrichment, AI columns, routing. Rex (`tools/rex/`, unofficial) lets Claude work in it.
+- **Clay** (Treford workspace "Johnson's Workspace"): searches, enrichment, AI columns, routing, through the Clay CLI with
+  its own sign-in kept outside this repo. Check `clay whoami` shows Johnson's Workspace before any Clay step.
 - **HubSpot** (week 3), **n8n** (week 4), a sequencer for sending (Smartlead or Clay Sequencer; nothing is sent from here).
 - Free public data used for trade contractors: city permit portals, NOAA storm events, state licence boards, SBA loan data.
 - Skills (`.claude/skills/`, from Bolaji Anifowose's GTM starter kit, licences in THIRD-PARTY.md):
