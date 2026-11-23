@@ -1,8 +1,10 @@
 # CLAUDE.md - ServiceTitan GTM Context OS
 
 ## Company
-ServiceTitan (servicetitan.com): software that runs residential and commercial trade contractors (HVAC, plumbing,
-electrical, roofing and more). Filled in after research: see context/docs/research/company.md.
+ServiceTitan (servicetitan.com, Nasdaq: TTAN): "AI software for commercial and residential trades", the operating system
+for HVAC, plumbing, electrical, roofing and other trade contractors. FY2026 revenue $961.0M, about 10,800 Active
+Customers, priced mainly per field technician (context/docs/research/company.md). ICP in one line: owner-run trade
+contractors with 10 to 99 employees, adding technicians or a location, still on paper or a starter app (context/icp/icp.md).
 
 ## How this folder works
 - `context/docs/research/` raw facts, one file per topic, every fact with a source and date. Read before any GTM task.
