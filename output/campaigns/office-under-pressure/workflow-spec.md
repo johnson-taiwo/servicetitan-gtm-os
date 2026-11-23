@@ -1,7 +1,7 @@
 # Workflow Spec: Office Under Pressure (hiring office staff)
 
-**Status:** STRUCTURE-APPROVED 2026-11-23 (Johnson Taiwo; approval given up front for an end-to-end build, open to
-review) · copy pending · C1 to C4 launch; C5, C6 hold (see Which cells can launch) · not sendable until a facts file,
+**Status:** COPY-APPROVED 2026-11-23 (structure and copy approved by Johnson Taiwo up front for an end-to-end
+build, open to review; structure approved the same day) · E1, E2, E3 + 2 LinkedIn DMs written · C1 to C4 launch; C5, C6 hold (see Which cells can launch) · not sendable until a facts file,
 a sender and suppression lists exist
 
 Signal matrix reference: G1 / W1 in `context/icp/signal-matrix.md` (18/20), with G2 as a router and G4 as a context
@@ -176,3 +176,117 @@ Never available to copy:
 1. Confirm in Clay that the Find Jobs search is free and how many small trade shops it covers (Week 2, first step).
 2. A dispatch proof point (unblocks C3).
 3. Facts file, sender, CTA and suppression lists before any copy is sent (`/campaign-copy` builds the facts file).
+
+---
+
+## Copy
+
+*Written 2026-11-23 with `/campaign-copy` rules (`knowledge-base/playbooks/copy-iron-laws.md`, `copy-bans.yaml`).
+Register: SIGNAL play. Every name and number traces to `context/messaging/facts.md`. Variables only from section 6.
+Dynamic lines resolve in Clay (one clean sentence per row, no spintax); static lines carry spintax. Routing is
+exhaustive (6 cells cover every row), so no fallback is needed; C3 stays on hold until `{{dispatch_proof}}` exists.*
+
+Line map (E1): L1 the role they posted · L2 technician hiring · L3 value prop · L4 matched proof · L5 CTA.
+
+### Email 1 (day 0)
+
+**Subject:** {new office hire|the office hire|adding to the office}
+
+```
+{{first_name}},
+
+{{e1l1}}
+
+{{e1l2}}
+
+ServiceTitan {runs|keeps} calls, dispatch, invoices and payroll in one system built for the trades, and its AI agent {answers|picks up} overflow and after-hours calls and books them onto the schedule.
+
+{{social_proof}}
+
+{Worth a look before the new hire starts?|Worth comparing before the new hire starts?}
+
+{{sender_name}}
+```
+
+**{{e1l1}}** (router: `role_family`)
+| Route | Line |
+|---|---|
+| phones | The {{role_posted}} opening at {{company_name}} usually means call volume has grown past the people answering it. |
+| dispatch | Bringing on a {{role_posted}} usually means scheduling at {{company_name}} has become a full-time job. |
+| office | The {{role_posted}} opening at {{company_name}} usually means the billing and paperwork now need someone full time. |
+
+**{{e1l2}}** (router: `hiring_techs`)
+| Route | Line |
+|---|---|
+| true | With technician roles open as well, my guess is the trucks and the office are growing at the same time. |
+| false | Could be off, but my read is the field team is holding steady while the office workload grows. |
+
+**{{social_proof}}** (one per cell, from facts.md)
+| Cell | Line |
+|---|---|
+| C1 phones, office only | Brothers Plumbing cut their call abandon rate from near 30% to 5% on it. |
+| C2 phones, both | Vines Restoration went from 400 to 500 abandoned calls a day to slim to none, with 70+ trucks on the road. |
+| C3 dispatch, office only | {{dispatch_proof}} (cell on hold) |
+| C4 dispatch, both | Young Plumbing went from 4 to 8 trucks in a year on it. |
+| C5 office, office only | Adams Power now gets service invoices out in a week and a half to two weeks, versus up to four before. |
+| C6 office, both | Young Plumbing grew revenue 62% in a year while the fleet went from 4 trucks to 8. |
+
+QA: passed. insult ok, nexus ok, facts-traced ok, spintax ok (static only), no-cliche ok, no banned words [word count E1: 85 to 99 depending on route, counted with a sample name; under the 120 ceiling, above the 60 optimum: the value line is the one to cut if replies are low]
+
+### Email 2 (day 3, same thread, subject "Re: <Email 1 subject>")
+
+```
+{{first_name}},
+
+Once {the new hire|the new person} is in, the next question is usually what the owner can see from the office.
+
+On ServiceTitan, booked calls, close rates and job costs {show up as they happen|are live}, not at month end.
+
+Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max.
+
+{Would a short example from a shop your size help?|Useful to see a short example from a shop your size?}
+```
+
+QA: passed. adds new value (owner view, close rate) not in E1, no repeated lines, subject unchanged [word count: 68]
+
+### Email 3 (day 10, same thread)
+
+```
+{{first_name}},
+
+If someone else at {{company_name}} {looks after|handles} the software for the office, who would that be?
+
+Happy to send them the Brothers Plumbing call numbers instead.
+```
+
+QA: passed. referral CTA from the ladder, new ask, no PS [word count: 28]
+
+### LinkedIn (to the operations or general manager, when found)
+
+Connection request: empty (no note).
+
+**DM 1** (router: `role_family`)
+| Route | Message |
+|---|---|
+| phones | {{first_name}}, with {{company_name}} adding to the phone team, is the extra call volume going to people, software, or both? |
+| dispatch | {{first_name}}, with a {{role_posted}} joining {{company_name}}, is scheduling run on a board today or already in software? |
+| office | {{first_name}}, as {{company_name}} adds an office lead, is billing handled in one system yet or spread across a few? |
+
+**DM 2** (static)
+```
+No rush on that. I work with {trade contractors|contractors} adding office staff, and the Brothers Plumbing call numbers {usually|tend to} start a good conversation. Happy to send them over.
+```
+
+### Persona review and human test (read as the owner of a 25-person HVAC shop that just posted a CSR job)
+
+| Check | Finding | Change made |
+|---|---|---|
+| Relevance | L1 names the exact role they posted, so it reads as written to them | None |
+| Credibility | Proof is a named contractor with a number, matched to the role | None |
+| Insult test | "grown past the people answering it" could read as "you're missing calls" | Kept "usually means" + growth framing, no mention of missed calls; the phones proof talks about another company's numbers, not theirs |
+| CTA friction | "Worth a look before the new hire starts?" is a yes/no tied to their timing | None |
+| Sounds like a person? | E1 value line was long | Cut it to one sentence; E3 kept to two lines |
+| Banned words | Checked against copy-bans.yaml: none of "saw your", "noticed", "free", "book a call", em dashes | None needed |
+
+**Status of copy:** written and self-reviewed against the QA gate and the persona review; COPY-APPROVED (see Status). Sendable only once
+`{{sender_name}}`, `{{dispatch_proof}}` and suppression lists exist (see Open items).
