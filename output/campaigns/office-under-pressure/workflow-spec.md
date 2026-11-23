@@ -1,8 +1,8 @@
 # Workflow Spec: Office Under Pressure (hiring office staff)
 
 **Status:** COPY-APPROVED 2026-11-23 (structure and copy approved by Johnson Taiwo up front for an end-to-end
-build, open to review; structure approved the same day) · E1, E2, E3 + 2 LinkedIn DMs written · C1 to C4 launch; C5, C6 hold (see Which cells can launch) · not sendable until a facts file,
-a sender and suppression lists exist
+build, open to review; structure approved the same day) · E1, E2, E3 + 2 LinkedIn DMs written · C1, C2, C4, C5, C6 launch; C3 holds for a dispatch proof point (see Which cells can launch) · not sendable
+until a sender and suppression lists exist
 
 Signal matrix reference: G1 / W1 in `context/icp/signal-matrix.md` (18/20), with G2 as a router and G4 as a context
 clause. Method: `knowledge-base/playbooks/workflow-anatomy.md`, `signal-matrix-framework.md`.
