@@ -19,6 +19,41 @@ Context OS -> signal fires -> find companies -> free checks -> size proof -> ICP
    -> weekly review -> back into the Context OS
 ```
 
+## Diagram (GitHub draws this from the code below)
+
+```mermaid
+flowchart TD
+    A["Context OS: ICP, signals, facts, learnings"] --> B{"Signal fired this period?"}
+    B -- "no: log a zero" --> A
+    B -- yes --> C["Find companies: Clay Find Jobs, Maps grid, permits, storm counties"]
+    C --> D{"Website or phone?"}
+    D -- no --> X1["Drop: no way to reach"]
+    D -- yes --> E{"Free checks: trade, area, customer, competitor, contacted in 90 days"}
+    E -- fail --> X2["Drop with reason"]
+    E -- pass --> F{"Size proven 10+? PPP, OSHA, FMCSA, Form 5500, LinkedIn, Clay last"}
+    F -- below --> X3["Drop"]
+    F -- not provable --> H1["Hold: size unknown view"]
+    F -- yes --> G{"AI fit: service contractor, which trade"}
+    G -- no --> X4["Drop"]
+    G -- unclear --> G2["One web read, then decide"]
+    G -- yes --> R["Route: segment x signal cell"]
+    R -- cell on hold --> H2["Hold in cell view"]
+    R -- live cell --> P["Find owner, then ops manager"]
+    P --> V{"Email found and verified?"}
+    V -- no --> X5["Record not found"]
+    V -- yes --> Q{"Final check: names, domain match, 3 per company, mail provider lane"}
+    Q -- fixable --> Q
+    Q -- pass --> S["Sequence: 3 emails + LinkedIn"]
+    S --> RP{"Reply"}
+    RP -- interested --> CRM["HubSpot deal, signal kept on the deal"]
+    RP -- wrong person --> P
+    RP -- not now --> N["Nurture date"]
+    RP -- no or bounce --> SUP["Suppress 90 days"]
+    CRM --> W["Weekly review: per signal and cell"]
+    N --> W
+    W -- "change angle, kill signal, keep winners" --> A
+```
+
 ## Step by step
 
 | # | Step | What happens | Tool | Decisions (each answer and what it leads to) |
