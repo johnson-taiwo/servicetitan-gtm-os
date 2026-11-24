@@ -1,153 +1,142 @@
-# Workflow Spec: Office Under Pressure (hiring office staff)
+# Workflow Spec: Office Under Pressure (contractors that are hiring)
 
-**Status:** COPY-APPROVED 2026-11-23 (structure and copy approved by Johnson Taiwo up front for an end-to-end
-build, open to review; structure approved the same day) · E1, E2, E3 + 2 LinkedIn DMs written · C1, C2, C4, C5, C6 launch; C3 holds for a dispatch proof point (see Which cells can launch) · not sendable
-until a sender and suppression lists exist
+**Status:** STRUCTURE-REVISED 2026-11-24 (Johnson Taiwo: trigger widened from office roles only to any job posted in
+the last 30 days, after the Week 2 Clay check showed 1 office post in 30 days across 3,221 ICP companies; the role
+being hired now routes) · copy revised for the new cells, review pending · C1, C3, C4, C5, C6 launch; C2 holds for a
+dispatch proof point · not sendable until a sender and suppression lists exist
 
-Signal matrix reference: G1 / W1 in `context/icp/signal-matrix.md` (18/20), with G2 as a router and G4 as a context
+Signal matrix reference: G1 + G2 / W1 + W2 in `context/icp/signal-matrix.md` (18/20 and 17/20), merged into one
+workflow because Clay's job data is thin for trade contractors (see "Week 2 Clay check" below). G4 stays a context
 clause. Method: `knowledge-base/playbooks/workflow-anatomy.md`, `signal-matrix-framework.md`.
 Source tags: co company.md · cu customers.md · cmp competitors.md · mk market.md · sg signals.md · pr practitioner.md
 (all in `context/docs/research/`). **INFERRED** = our reading, not sourced.
+
+### Week 2 Clay check (24 Nov 2026, free Clay company searches, US HQ, 11-200 staff)
+| Filter | Companies |
+|---|---|
+| Industry "Specialty Trade Contractors" or "Building Equipment Contractors", no signal | 3,221 |
+| + office role (CSR, dispatcher, office manager) posted in the last 30 days (trade code 238220/238210) | 1 |
+| + office role open now, any post date (industry) | 9 |
+| + any job posted in the last 30 days (industry) | **58** (chosen) |
+| + office person who started in the last 6 months (industry) | 16 |
+
+Clay sees job posts for about 2% of these companies. Trade contractors hire on Indeed and Facebook and field crews
+skip LinkedIn (pr §1), so a narrow office-only trigger can't fill a list from Clay alone. Also: Clay's size band and
+its own headcount estimate disagree for 6 of 42 companies, so size is checked per row, never taken from the band.
 
 ---
 
 ## 1. Mother Intent (Trigger) [ENGINE]
 
-**Trade contractors in the US that posted a job for a customer service rep, call-center agent, dispatcher or office
-manager in the last 30 days.**
+**US trade contractors (11-200 staff on Clay's band) that posted any job in the last 30 days.**
 
-- Catalog match: ⭐ "Hiring specific roles", Hiring & Team Composition (`workflow-anatomy.md`).
-- Signal-led: the job post fires the send. Trade and size only filter; the role and technician hiring route the story.
-- Why this signal: ServiceTitan's strongest proof is about the office, not the field: call abandon rate "near 30%" cut
-  to 5% (Brothers Plumbing, cu §2), abandoned calls "400-500/day" to "slim to none" (Vines, cu §2), invoices out in
-  "a week and a half to two weeks" instead of "four weeks" (Adams Power, cu §3). A company hiring for the office is
-  paying to solve the problem the product solves.
+- Catalog match: ⭐ "Hiring specific roles" / "Companies in hypergrowth (hiring velocity)" (`workflow-anatomy.md`).
+- Signal-led: the job post fires the send. What role they are hiring routes the story.
+- Why: ServiceTitan's strongest proof is about the office (calls, dispatch, billing), and its pricing and growth follow
+  technician count (sg §1 #3, #4). Hiring for either side is the moment the system is under load.
 
 ## 2. Inclusion / Exclusion [ICP]
 
 ### Include
 
 **ICP box**
-| Filter | Value | Source |
+| Filter | Value (typed into Clay) | Source |
 |---|---|---|
-| Country | United States (Canada in a later run) | icp.md Layer 1 |
-| Trade | HVAC, plumbing, electrical, garage door; roofing goes to the storm workflow (W3) | icp.md Layer 1, S1 |
-| Employees | 10 to 99, proven from an exact source (LinkedIn page count, PPP jobs, Form 5500, FMCSA, OSHA; Clay company enrichment last) | icp.md Layer 1; pr §1, §2 |
-| Type | Residential or mixed residential and commercial service business (AI fit column) | icp.md S1 |
+| Country | `locations.any(is_headquarters = true and country_name = "United States")` | icp.md Layer 1 |
+| Industry | `industry in ("Specialty Trade Contractors", "Building Equipment Contractors")`, then the AI fit column keeps only HVAC, plumbing, electrical, garage door | icp.md S1; trade code 238220/238210 returned 1 row, too narrow |
+| Size (search) | `company_size in ("11-50", "51-200")` | Clay band, pre-filter only |
+| Size (gate) | 10 to 99 employees: Clay estimated employee count, confirmed by Clay "Enrich Company" headcount when they disagree | icp.md Layer 1; pr §1 |
 
-**Trigger definition**
-- Job title contains any of: Customer Service Representative, CSR, Call Center, Call Centre, Customer Care, Dispatcher,
-  Dispatch Coordinator, Service Coordinator, Office Manager, Office Administrator, Scheduler, Booking.
-- Job title contains none of: Driver, Technician, Installer, Sales, Recruiter, Insurance, Bank (keeps the role an
-  office role at a contractor; INFERRED keyword list).
-- Posted 0 to 30 days before the run date.
-- Hiring company is the contractor itself, not a staffing agency posting for a client.
+**Trigger definition:** `jobs.exists(job_posted_date >= today() - interval 30 days)` on the company search.
 
-**Recipient:** the owner (economic buyer, `personas.md` §2). The operations or general manager is a second thread when
-found (`personas.md` §1). The office manager is not emailed: they are often the role being hired or backfilled.
+**Recipient:** the owner (economic buyer, `personas.md` §2); the operations or general manager as a second thread when
+found (`personas.md` §1).
 
 ### Exclude
 | Who | Why | How matched |
 |---|---|---|
-| Job posts that ask for ServiceTitan experience | The company most likely already runs ServiceTitan (INFERRED) | Job description contains "ServiceTitan" or "Service Titan" |
-| Staffing and recruiting agencies | They post office roles for clients (INFERRED) | Company industry = Staffing and Recruiting, or name contains "Staffing", "Personnel", "Recruit" |
-| Franchise head offices | Bought centrally; segment S2 | AI fit column: franchisor = true |
-| Suppliers, distributors, manufacturers | Partners, not users (sg §1 #8) | AI fit column: business type not in the allowed list |
-| Under 10 employees, or size not provable | Below the targeting floor; unproven size is held, not mailed (icp.md Not a fit) | Size proof column |
-| Existing ServiceTitan customers named in research | Customers | Domain blocklist from cu §2, plus `{{customer_suppression_list}}` (not public) |
-| Contacted in the last 90 days, or in active pipeline | No double-touching | `{{crm_suppression_list}}` (not public) |
+| Job post asks for ServiceTitan experience | Probably already a customer (INFERRED) | Separate search: same filters + `job_description contains "ServiceTitan"`; lookup by domain |
+| Not a service trade (painting, concrete, landscaping, roofing goes to W3) | Outside this workflow's trades | AI fit column |
+| Staffing and recruiting firms | Post jobs for clients | Industry filter already excludes; AI fit column backstop |
+| Under 10 or over 99 employees | Outside the ICP size | Size gate |
+| Existing ServiceTitan customers named in research | Customers | Exclusions table (cu §2 names + domains) |
+| Contacted in the last 90 days | No double-touching | `{{crm_suppression_list}}` (not public) |
 
 ## 3. Sources [ENGINE]
 
 | Purpose | Source | Tool | Status |
 |---|---|---|---|
-| Trigger: office job posts, last 30 days | PredictLeads, Google Jobs and Clay's own jobs data | Clay "Find Jobs" (source), keywords from the trigger definition | Exists (sg §2d #31). Whether the search is free and how well it covers small trade shops: test in Week 2 (sg Gaps) |
-| Technician hiring count (router) | Same | Clay "Find Jobs" at the company domain | Exists; same coverage caveat |
-| Company detail: domain, industry, HQ, LinkedIn page | Company website, LinkedIn | Clay "Enrich Company" (paid, last resort) or the free company file (pr §1) | Tested in practice (pr §1) |
-| Size proof | LinkedIn page count (free); SBA PPP jobs, Form 5500, FMCSA, OSHA (free bulk files) | Free LinkedIn counter; offline match on phone or name + state | Tested in practice (pr §1, §2) |
-| Business type and trade (fit) | Company website text | Clay Use AI column, JSON with an evidence field | To build in Week 2 |
-| Owner / GM name | LinkedIn, company team page | Clay "Find People" at the company domain (free search) | Exists |
-| Work email | Email waterfall | Clay "Find work email", strict validation | Exists; cost per row to be measured |
-
-**Before the build:** run the Find Jobs search with the trigger keywords and read the count before importing (free if
-the Week 2 test confirms; if it's paid, ask first).
+| Trigger: companies with a job posted in 30 days | Clay companies dataset, job postings | Clay Find Companies (free search) with the filters above | Tested 24 Nov: 58 companies |
+| Which roles they posted (router) | Same, one search per role family, joined on domain | Clay Find Companies (free) x 3: office roles, technician roles, any role | To run in Week 2 |
+| Size gate | Clay estimated employee count; Clay "Enrich Company" when unsure | Clay (enrichment is paid) | Test on 1 row first |
+| Business type and trade (fit) | Company website and description | Clay Use AI column, JSON + evidence | Prove on 3 rows first |
+| Owner / GM | LinkedIn people data | Clay Find People at company (free search) | To run |
+| Work email | Email waterfall | Clay "Find work email", strict validation | Paid; ready rows only |
 
 ## 4. Signals table [ENGINE]
 
 | # | Signal | Role | How it's read | Output |
 |---|---|---|---|---|
-| 1 | Office role posted in the last 30 days | trigger | Job title matches the include list AND not the exclude list (keyword match) AND posted date is 30 days or fewer before the run | `is_office_hire` (true/false) |
-| 2 | Which office role | router | Keyword match on the job title, first match wins in this order: Dispatcher / Dispatch / Scheduler / Service Coordinator = `dispatch`; Customer Service / CSR / Call Center / Call Centre / Customer Care / Booking = `phones`; Office Manager / Office Administrator = `office` | `role_family`: phones / dispatch / office |
-| 3 | Also hiring field technicians | router | Count of open jobs at the same company whose title contains Technician, Tech, Installer, Plumber, Electrician, Apprentice, posted in the last 30 days. Clusters: 0 = office only; 1 or more = growing on both sides | `hiring_techs` (true/false) |
-| 4 | Starter app named in the job post | context-clause (never routes) | Job description contains "Housecall Pro", "Jobber", "Service Fusion", "Kickserv", "FieldEdge" or "Successware" (keyword match) | `current_tool` (text or empty) |
-| 5 | Trade | context-clause (never routes) | AI fit column, allowed values: HVAC, plumbing, electrical, garage door, multi-trade | `trade` |
-| 6 | City | context-clause (never routes) | Job location city, else company HQ city | `city` |
+| 1 | Any job posted in the last 30 days | trigger | Company is in the trigger search result | `is_hiring` (true) |
+| 2 | Hiring office staff | router | Company is also in the office search: `jobs.exists(job_posted_date >= today() - interval 30 days and job_title is_similar_to ("Customer Service Representative", "Dispatcher", "Office Manager"))` | `hiring_office` (true/false) |
+| 3 | Which office role | router (inside office cells) | Keyword match on the office post's title: Dispatcher / Scheduler / Coordinator = `dispatch`; Customer Service / CSR / Call / Booking = `phones`; Office Manager / Administrator = `office` | `role_family` |
+| 4 | Hiring field technicians | router | Company is in the technician search: same date filter + `job_title is_similar_to ("HVAC Technician", "Plumber", "Electrician", "Service Technician", "Installer")` | `hiring_techs` (true/false) |
+| 5 | Starter app named in a post | context-clause (never routes) | Search with `job_description contains` "Housecall Pro" / "Jobber" / "Service Fusion" | `current_tool` |
+| 6 | Trade | context-clause | AI fit column: HVAC / plumbing / electrical / garage door / multi-trade | `trade` |
+| 7 | City | context-clause | Company HQ city from the search result | `city` |
 
-Routing axes: role family (3) x hiring technicians (2) = **6 cells**.
-
-Left out on purpose:
-- Revenue: unreliable for trades and not needed to route (pr §1).
-- Review count: a size hint only; Google's terms forbid storing it over time (signal matrix G9).
-- Number of office roles open: one role is enough to fire; a count adds nothing to the angle.
+Clusters: `hiring_office` x `hiring_techs` gives office only / field only / both / other roles only.
 
 ## 5. Routing matrix with angles [ENGINE]
 
-Fires in every cell: `is_office_hire` = true, ICP box passed, size proven 10 to 99.
+Fires in every cell: `is_hiring` = true, ICP box passed, size gate passed.
 
-What every cell assumes (INFERRED): a contractor adding an office role has more calls, jobs or invoices than the
-current office handles, and has decided to pay a salary to handle them.
+What every cell assumes (INFERRED): a contractor paying to add people has more calls, jobs or invoices than the current
+team handles.
 
 | Cell | Deterministic read | What it tells us (inferred situation) | The angle it earns |
 |---|---|---|---|
-| **C1. Phones, office only** | `role_family` = phones AND `hiring_techs` = false | Call volume has grown past the people answering it, while the field team is staying the same size | Answer and book every call without adding headcount for each one: AI virtual agent and online booking take overflow and after-hours calls. Proof: Brothers Plumbing, abandon rate "near 30%" to 5% (cu §2) |
-| **C2. Phones, growing both sides** | `role_family` = phones AND `hiring_techs` = true | The company is adding technicians and the calls to keep them busy at the same time | Every new technician needs booked calls: the phones decide whether new trucks are full. Proof: Vines, abandoned calls "400-500/day" to "slim to none", 70+ trucks (cu §2) |
-| **C3. Dispatch, office only** | `role_family` = dispatch AND `hiring_techs` = false | Scheduling has become a full-time job for the current crew size | One dispatch board that matches technicians to jobs and routes them, instead of a person juggling the whiteboard. Proof: `{{dispatch_proof}}` (no dispatch-specific result in research) |
-| **C4. Dispatch, growing both sides** | `role_family` = dispatch AND `hiring_techs` = true | The company is adding technicians and someone to schedule them: the crew is outgrowing the way jobs are assigned today | Add trucks without the schedule breaking: dispatch, scheduling and technician data in one place. Proof: Young Plumbing, 4 to 8 trucks in one year (cu §2) |
-| **C5. Office manager, office only** | `role_family` = office AND `hiring_techs` = false | The back office (billing, payroll, paperwork) needs a dedicated person | Invoices and payroll out of the spreadsheet. Proof: Adams Power, invoices in "a week and a half to two weeks" vs "four weeks" (cu §3); Crown, payroll team 3 to 1 (cu §2) |
-| **C6. Office manager, growing both sides** | `role_family` = office AND `hiring_techs` = true | The company is growing in the field and adding the first or second office lead to run it | The office is being built now: build it on one system before it is built on spreadsheets. Proof: Young Plumbing, "I'm running a business" (cu §3) |
+| **C1. Phones, office only** | `hiring_office` AND `role_family` = phones AND NOT `hiring_techs` | Call volume has grown past the people answering it | Calls answered and booked, after hours too, without a hire for each one. Proof: Brothers Plumbing, abandon rate near 30% to 5% (cu §2) |
+| **C2. Dispatch, office only** | `hiring_office` AND `role_family` = dispatch AND NOT `hiring_techs` | Scheduling has become a full-time job | One dispatch board instead of a person juggling the whiteboard. Proof: `{{dispatch_proof}}` (none in research) |
+| **C3. Office manager, office only** | `hiring_office` AND `role_family` = office AND NOT `hiring_techs` | The back office needs a dedicated person | Invoices and payroll out of spreadsheets. Proof: Adams Power invoices in 1.5 to 2 weeks vs up to 4 (cu §3) |
+| **C4. Field only** | `hiring_techs` AND NOT `hiring_office` | Adding trucks while the office stays the same size | Every new technician needs booked calls and a schedule. Proof: Young Plumbing, 4 to 8 trucks in a year (cu §2) |
+| **C5. Office and field** | `hiring_office` AND `hiring_techs` | Growing on both sides at once | The phones decide whether new trucks are full. Proof: Vines, 400 to 500 abandoned calls a day to slim to none, 70+ trucks (cu §2) |
+| **C6. Other roles** | `is_hiring` AND NOT `hiring_office` AND NOT `hiring_techs` (e.g. sales, estimator, apprentice) | Growing, role not office or field | More booked calls and higher close rates from the same team. Proof: Redding, booking rate +30%, close rate +40% (cu §2) |
 
 ### Lines that never route
 | Variable | When present | When empty |
 |---|---|---|
-| `current_tool` | One line can name the tool they're asking applicants to know, and that ServiceTitan's own comparison pages speak to shops with "ambitions to grow" beyond it (sg §1 #9). Never criticise the tool | No line about tools |
-| `trade` | Picks the trade word ("HVAC calls", "plumbing calls") | n/a (every row passes the fit column) |
-| `city` | Local colour ("in {{city}}") | Leave out |
+| `current_tool` | One line can name the tool a post asks for; never criticise it | No tool line |
+| `trade` | Picks the trade word | n/a |
+| `city` | Local colour | Leave out |
 
-**Branch coverage:** all 6 cells have first name, company name, role posted, role family, hiring technicians (true or
-false), trade, city. No angle depends on `current_tool`. C3 has no research proof yet, so it uses a placeholder.
+**Branch coverage:** every cell has first name, company name, trade, city, the hiring flags. `role_posted` exists only in
+cells with an office post (C1-C3, C5); C4 and C6 copy must not use it.
 
-**Niche-native test:** each angle ties the exact role they posted to the part of the business it shows is stretched.
-A general "grow your business" angle would fail this test; these could only be sent to a contractor hiring that role.
+**Niche-native test:** each angle ties the type of hire to the part of the business it shows is stretched.
 
 ### Which cells can launch
 | Cells | Status | What unblocks them |
 |---|---|---|
-| C1, C2, C4 | Launch in v1 | Nothing in structure. Facts file, sender and suppression lists still needed before any send |
-| C3 | Hold | A dispatch-specific proof point (ask ServiceTitan or find one) |
-| C5, C6 | Launch in v1, lower priority | Office manager posts may be backfills, not growth (INFERRED): watch reply rate in the first 200 sends |
+| C1, C3, C4, C5 | Launch | Sender and suppression lists |
+| C6 | Launch, watch | Weakest signal; check reply rate after the first 200 sends |
+| C2 | Hold | A dispatch-specific proof point |
 
 ## 6. Variables contract [ENGINE]
-
-Copy may use only these. If a variable isn't listed, copy can't say it.
 
 | Variable | Source field | Exists in branches |
 |---|---|---|
 | `{{first_name}}` | Owner or GM first name (Clay Find People), cleaned | All |
-| `{{company_name}}` | Company name, legal suffix stripped (LLC, Inc), short form | All |
-| `{{role_posted}}` | The job title they posted, cleaned to plain words (e.g. "customer service rep") | All |
-| `{{role_family}}` | phones / dispatch / office (signal 2) | All |
-| `{{hiring_techs}}` | true / false (signal 3); copy needs a version for each value | All |
-| `{{trade}}` | HVAC / plumbing / electrical / garage door / multi-trade (signal 5) | All |
-| `{{city}}` | Job or HQ city (signal 6) | Most; copy must work without it |
-| `{{current_tool}}` | Tool named in the post (signal 4) | Some; never required |
-| `{{proof_name}}`, `{{proof_result}}` | Static per cell from section 5 (C1 Brothers Plumbing, C2 Vines, C4 and C6 Young Plumbing, C5 Adams Power); C3 = `{{dispatch_proof}}` | All (C3 unfilled) |
-| `{{sender_name}}`, `{{sender_title}}` | Not set (study build) | All (unfilled) |
-| `{{cta}}` | Not set | All (unfilled) |
+| `{{company_name}}` | Company name, legal suffix stripped, short form | All |
+| `{{role_posted}}` | Office post title cleaned to plain words | C1, C2, C3, C5 only |
+| `{{trade}}` | AI fit column | All |
+| `{{city}}` | Company HQ city | Most; copy must work without it |
+| `{{current_tool}}` | Signal 5 | Some; never required |
+| `{{social_proof}}` | Static per cell (section 5) | All (C2 unfilled) |
+| `{{sender_name}}`, `{{sender_title}}`, `{{cta}}` | Not set (study build) | All (unfilled) |
 
-Never available to copy:
-- A raw employee count or number of open jobs.
-- Any claim that the company is missing calls or losing money (situation only, never a diagnosis).
-- Prices or contract terms (not public; the top complaint area, cu §7).
+Never available to copy: a raw employee count, the number of open jobs, any claim they are missing calls or money,
+prices or contract terms.
 
 ## 7. Cadence & channel [ENGINE]
 
@@ -155,7 +144,7 @@ Never available to copy:
   Periodicity Matrix). Send only while the post is 30 days old or less.
 - **Dedupe:** one entry per company (key: domain) per 90 days; the owner is the contact.
 - **Channel:** email, 3 emails over 10 days in one thread; LinkedIn connection to the GM when found.
-- **Send gates:** C1, C2, C4, C5, C6 send; C3 collects in its own view until a proof point exists.
+- **Send gates:** C1, C3, C4, C5, C6 send; C2 collects in its own view until a proof point exists.
 
 ---
 
@@ -165,7 +154,7 @@ Never available to copy:
 - [x] Exclusion: who's out and why
 - [x] Sources: trigger + every enrichment
 - [x] Signals table: every read deterministic, every role declared
-- [x] Count clusters declared (signal 3: 0 / 1 or more)
+- [x] Clusters declared (office x field: office only / field only / both / other)
 - [x] Routing matrix with every angle filled
 - [x] Branch coverage checked
 - [x] Variables contract: every variable mapped to its source field
@@ -173,7 +162,7 @@ Never available to copy:
 - [x] Cadence & channel declared
 
 ## Open items
-1. Confirm in Clay that the Find Jobs search is free and how many small trade shops it covers (Week 2, first step).
+1. Done 24 Nov: Clay's job search is free and covers about 2% of small trade contractors (58 of 3,221 with a post in 30 days); trigger widened.
 2. A dispatch proof point (unblocks C3).
 3. Facts file, sender, CTA and suppression lists before any copy is sent (`/campaign-copy` builds the facts file).
 
@@ -208,28 +197,33 @@ ServiceTitan {runs|keeps} calls, dispatch, invoices and payroll in one system bu
 {{sender_name}}
 ```
 
-**{{e1l1}}** (router: `role_family`)
+**{{e1l1}}** (router: cell)
 | Route | Line |
 |---|---|
-| phones | The {{role_posted}} opening at {{company_name}} usually means call volume has grown past the people answering it. |
-| dispatch | Bringing on a {{role_posted}} usually means scheduling at {{company_name}} has become a full-time job. |
-| office | The {{role_posted}} opening at {{company_name}} usually means the billing and paperwork now need someone full time. |
+| C1 phones | The {{role_posted}} opening at {{company_name}} usually means call volume has grown past the people answering it. |
+| C2 dispatch | Bringing on a {{role_posted}} usually means scheduling at {{company_name}} has become a full-time job. |
+| C3 office manager | The {{role_posted}} opening at {{company_name}} usually means the billing and paperwork now need someone full time. |
+| C4 field only | Adding technicians at {{company_name}} usually means more trucks to keep busy every morning. |
+| C5 office and field | Hiring for the office and the field at once usually means {{company_name}} is growing on both sides. |
+| C6 other roles | A new opening at {{company_name}} usually means the team is growing. |
 
-**{{e1l2}}** (router: `hiring_techs`)
+**{{e1l2}}** (router: cell)
 | Route | Line |
 |---|---|
-| true | With technician roles open as well, my guess is the trucks and the office are growing at the same time. |
-| false | Could be off, but my read is the field team is holding steady while the office workload grows. |
+| C1, C2, C3 | Could be off, but my read is the field team is holding steady while the office workload grows. |
+| C4 | My guess is the office will feel every one of those new trucks. |
+| C5 | With a {{role_posted}} and technicians both open, my guess is the calls and the schedule are where it gets tight. |
+| C6 | Could be off, but growth usually shows up first in the calls that need booking. |
 
 **{{social_proof}}** (one per cell, from facts.md)
 | Cell | Line |
 |---|---|
 | C1 phones, office only | Brothers Plumbing cut their call abandon rate from near 30% to 5% on it. |
-| C2 phones, both | Vines Restoration went from 400 to 500 abandoned calls a day to slim to none, with 70+ trucks on the road. |
-| C3 dispatch, office only | {{dispatch_proof}} (cell on hold) |
-| C4 dispatch, both | Young Plumbing went from 4 to 8 trucks in a year on it. |
-| C5 office, office only | Adams Power now gets service invoices out in a week and a half to two weeks, versus up to four before. |
-| C6 office, both | Young Plumbing grew revenue 62% in a year while the fleet went from 4 trucks to 8. |
+| C2 dispatch, office only | {{dispatch_proof}} (cell on hold) |
+| C3 office manager, office only | Adams Power now gets service invoices out in a week and a half to two weeks, versus up to four before. |
+| C4 field only | Young Plumbing went from 4 to 8 trucks in a year on it. |
+| C5 office and field | Vines Restoration went from 400 to 500 abandoned calls a day to slim to none, with 70+ trucks on the road. |
+| C6 other roles | Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max. |
 
 QA: passed. insult ok, nexus ok, facts-traced ok, spintax ok (static only), no-cliche ok, no banned words [word count E1: 85 to 99 depending on route, counted with a sample name; under the 120 ceiling, above the 60 optimum: the value line is the one to cut if replies are low]
 
@@ -242,12 +236,14 @@ Once {the new hire|the new person} is in, the next question is usually what the 
 
 On ServiceTitan, booked calls, close rates and job costs {show up as they happen|are live}, not at month end.
 
-Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max.
+{{e2_proof}}
 
 {Would a short example from a shop your size help?|Useful to see a short example from a shop your size?}
 ```
 
-QA: passed. adds new value (owner view, close rate) not in E1, no repeated lines, subject unchanged [word count: 68]
+**{{e2_proof}}**: C6 = Young Plumbing grew revenue 62% in a year on it. All other cells = Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max.
+
+QA: passed. adds new value (owner view, close rate) not in E1, no repeated lines across the sequence for any cell, subject unchanged [word count: 68]
 
 ### Email 3 (day 10, same thread)
 
@@ -265,19 +261,21 @@ QA: passed. referral CTA from the ladder, new ask, no PS [word count: 28]
 
 Connection request: empty (no note).
 
-**DM 1** (router: `role_family`)
+**DM 1** (router: cell: phones = C1, dispatch = C2, office = C3 and C5, field only = C4, other roles = C6)
 | Route | Message |
 |---|---|
 | phones | {{first_name}}, with {{company_name}} adding to the phone team, is the extra call volume going to people, software, or both? |
 | dispatch | {{first_name}}, with a {{role_posted}} joining {{company_name}}, is scheduling run on a board today or already in software? |
 | office | {{first_name}}, as {{company_name}} adds an office lead, is billing handled in one system yet or spread across a few? |
+| field only | {{first_name}}, with {{company_name}} adding technicians, is dispatch keeping up or is that the next thing to sort? |
+| other roles | {{first_name}}, with {{company_name}} growing the team, are new calls booked by people, software, or both? |
 
 **DM 2** (static)
 ```
-No rush on that. I work with {trade contractors|contractors} adding office staff, and the Brothers Plumbing call numbers {usually|tend to} start a good conversation. Happy to send them over.
+No rush on that. I work with {trade contractors|contractors} who are hiring, and the Brothers Plumbing call numbers {usually|tend to} start a good conversation. Happy to send them over.
 ```
 
-### Persona review and human test (read as the owner of a 25-person HVAC shop that just posted a CSR job)
+### Persona review and human test (read as the owner of a 25-person HVAC shop that just posted a CSR job; re-read 24 Nov for C4 to C6 as an owner hiring two technicians)
 
 | Check | Finding | Change made |
 |---|---|---|
