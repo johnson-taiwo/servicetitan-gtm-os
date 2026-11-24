@@ -35,7 +35,8 @@ contractors with 10 to 99 employees, adding technicians or a location, still on 
 - ICP: `context/icp/icp.md` (five layers, segments S1-S4, not a fit, challenge pass), `personas.md` (champion, owner, influencer),
   `signal-matrix.md` (segments x personas, signals scored on four tests, tracker)
 - System: `context/docs/gtm-system.md` (signal to CRM, tools, decisions, feedback loop)
-- Workflows: `output/campaigns/workflow-candidates.md`; `output/campaigns/office-under-pressure/workflow-spec.md` (STRUCTURE-APPROVED)
+- Workflows: `output/campaigns/workflow-candidates.md`, `campaign-strategy.md`; `output/campaigns/office-under-pressure/workflow-spec.md`
+  (trigger widened 24 Nov) and its Clay build plan in `clay-build/` (guide, flow diagram; exclusions.csv stays local)
 - This week: `weekly-priorities/2026-W48.md`, `work-log/2026-W48.md`
 - From the starter kit: `.claude/skills/` (19 skills), `knowledge-base/playbooks/` (method docs + Clay docs), `tools/`
 

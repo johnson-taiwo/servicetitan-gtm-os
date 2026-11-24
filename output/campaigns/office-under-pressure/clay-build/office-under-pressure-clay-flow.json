@@ -1,0 +1,31 @@
+{
+  "title": "How the ServiceTitan 'contractors that are hiring' workflow moves through Clay",
+  "subtitle": "Each row is a table. Follow the numbers left to right. Paid steps only run on rows that passed every step before them.",
+  "lanes": [
+    {"id": "excl", "name": "Exclusions", "note": "you upload it", "dashed": true},
+    {"id": "sig", "name": "Hiring signals", "note": "5 small searches,\nlooked up by domain", "dashed": true},
+    {"id": "co", "name": "Hiring Contractors", "note": "one row per company.\nThe main table.", "main": true},
+    {"id": "ppl", "name": "Owners", "note": "1 to 2 people\nper ready company"}
+  ],
+  "steps": [
+    {"id": "x", "n": "0", "lane": "excl", "col": 2, "title": "Never contact", "text": "Named ServiceTitan customers and rivals, by domain", "cost": null},
+    {"id": "s1", "n": "1", "lane": "co", "col": 1, "title": "Find hiring contractors", "text": "Company search: US trade contractors, 11-200 staff, a job posted in 30 days", "cost": "free"},
+    {"id": "s2", "n": "2", "lane": "sig", "col": 2, "title": "What are they hiring?", "text": "Same search x5: phones, dispatch, office manager, technicians, 'ServiceTitan' in a post", "cost": "free"},
+    {"id": "s3", "n": "3", "lane": "co", "col": 3, "title": "Free checks", "text": "Not excluded, not already on ServiceTitan, hiring flags read back", "cost": "free"},
+    {"id": "s4", "n": "4", "lane": "co", "col": 4, "title": "Size and trade", "text": "Enrich company: real headcount 10-99. AI: is it a service trade?", "cost": "paid"},
+    {"id": "s5", "n": "5", "lane": "co", "col": 5, "title": "Route to a cell", "text": "Office role x technicians = C1 to C6. C2 holds", "cost": "free", "highlight": true},
+    {"id": "s6", "n": "6", "lane": "ppl", "col": 6, "title": "Find the owner", "text": "People search at ready companies: owner first, then GM", "cost": "free"},
+    {"id": "s7", "n": "7", "lane": "ppl", "col": 7, "title": "Find + check email", "text": "Waterfall, strict. Email domain must match the company", "cost": "paid"},
+    {"id": "s8", "n": "8", "lane": "ppl", "col": 8, "title": "Email lines", "text": "Approved lines by cell, as formulas. Sequencer built, not run", "cost": "free"}
+  ],
+  "arrows": [
+    {"from": "s1", "to": "s3"},
+    {"from": "s2", "to": "s3", "label": "flags looked up\nby domain"},
+    {"from": "x", "to": "s3", "label": "checked against", "dashed": true},
+    {"from": "s3", "to": "s4"},
+    {"from": "s4", "to": "s5"},
+    {"from": "s5", "to": "s6", "label": "ready companies only"},
+    {"from": "s6", "to": "s7"},
+    {"from": "s7", "to": "s8"}
+  ]
+}
