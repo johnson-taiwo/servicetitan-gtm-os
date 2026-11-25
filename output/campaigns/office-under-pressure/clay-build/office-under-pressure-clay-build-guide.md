@@ -414,6 +414,15 @@ Helper columns first:
 **Check:** read two finished emails out loud, one from C1 and one from C4. They should match the spec word for word.
 **Cost:** free.
 
+**As built (25 Nov 2026), three changes from the formulas above:**
+1. True/false formula columns come back from Clay as the TEXT "true" / "false", so `!{{Send Ready?}}` is never true.
+   Every gate is written `!(({{Send Ready?}} + "") === "true") ? "" : ...` and every cell test `({{Cell}} + "") === "C4"`.
+2. `Company Short` also cuts anything after " | " (one company name came as "Bud Anderson | Cooling, Heating, ...").
+   It reads `{{Company}}` in the Owners table, not `{{Name}}`.
+3. Added `E2 Proof` (spec Email 2: C6 gets the Young Plumbing revenue line, every other cell the Redding line).
+Read back on all 28 owners: the 15 send-ready rows have all four lines, the 13 others are blank. No C1 or C3 rows
+exist in this build, so those branches are written but untested on live data.
+
 ---
 
 ## Part 10. Views and tidy up
