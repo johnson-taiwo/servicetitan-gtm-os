@@ -19,6 +19,7 @@ storm, a permit) and proving the company is big enough from public files before 
 | [`output/campaigns/office-under-pressure/workflow-spec.md`](output/campaigns/office-under-pressure/workflow-spec.md) | The Week 2 workflow: 6 routing cells with angles, variables, copy (3 emails, 2 DMs) |
 | [`output/campaigns/campaign-strategy.md`](output/campaigns/campaign-strategy.md) | 18 ranked campaign ideas |
 | [`output/campaigns/office-under-pressure/clay-build/`](output/campaigns/office-under-pressure/clay-build/) | Week 2: the Clay build plan, flow diagram and the live Clay workbook link with the funnel |
+| [`output/campaigns/office-under-pressure/week2b-audience-workflow/`](output/campaigns/office-under-pressure/week2b-audience-workflow/) | Week 2B: Clay Audience segment + live Workflow that enriches and routes the companies |
 | [`context/crm/crm-design.md`](context/crm/crm-design.md) | Week 3: CRM rules, buyer-led pipeline, both HubSpot workflows in plain words, test results |
 | [`context/crm/build-guide.md`](context/crm/build-guide.md) | Week 3: how the HubSpot build was done, click by click, with screenshots |
 | [`knowledge-base/learnings/`](knowledge-base/learnings/) | What worked and what didn't, after each build |
