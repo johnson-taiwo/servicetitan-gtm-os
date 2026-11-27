@@ -1,8 +1,8 @@
 # Workflow Spec: Office Under Pressure (contractors that are hiring)
 
-**Status:** STRUCTURE-REVISED 2026-11-24 (Johnson Taiwo: trigger widened from office roles only to any job posted in
-the last 30 days, after the Week 2 Clay check showed 1 office post in 30 days across 3,221 ICP companies; the role
-being hired now routes) · copy revised for the new cells, review pending · C1, C3, C4, C5, C6 launch; C2 holds for a
+**Status:** STRUCTURE-APPROVED 2026-11-24 (revised: trigger widened from office roles only to any job posted in the
+last 30 days, after the Week 2 Clay check showed 1 office post in 30 days across 3,221 ICP companies; the role being
+hired now routes) · COPY-APPROVED 2026-11-27 (subject now routed by cell) · C1, C3, C4, C5, C6 launch; C2 holds for a
 dispatch proof point · not sendable until a sender and suppression lists exist
 
 Signal matrix reference: G1 + G2 / W1 + W2 in `context/icp/signal-matrix.md` (18/20 and 17/20), merged into one
@@ -134,6 +134,11 @@ cells with an office post (C1-C3, C5); C4 and C6 copy must not use it.
 | `{{current_tool}}` | Signal 5 | Some; never required |
 | `{{social_proof}}` | Static per cell (section 5) | All (C2 unfilled) |
 | `{{sender_name}}`, `{{sender_title}}`, `{{cta}}` | Not set (study build) | All (unfilled) |
+| `{{subject}}` | Router on cell (Copy, Email 1): office-hire subject for C1-C3 and C5, technicians subject for C4, growth subject for C6 | All |
+| `{{e1l1}}` | Router on cell (Copy, Email 1 line 1); built in Clay as `E1 L1` | All live cells |
+| `{{e1l2}}` | Router on cell (Copy, Email 1 line 2); built in Clay as `E1 L2` | All live cells |
+| `{{e2_proof}}` | C6: Young Plumbing line; all other cells: Redding line (facts.md); built in Clay as `E2 Proof` | All live cells |
+| `{{dispatch_proof}}` | A dispatch-specific proof point; none exists in the research yet | C2 only (cell on hold) |
 
 Never available to copy: a raw employee count, the number of open jobs, any claim they are missing calls or money,
 prices or contract terms.
@@ -142,7 +147,8 @@ prices or contract terms.
 
 - **Periodicity:** always-on, run weekly. Job posts are the highest-velocity signal (`workflow-anatomy.md`
   Periodicity Matrix). Send only while the post is 30 days old or less.
-- **Dedupe:** one entry per company (key: domain) per 90 days; the owner is the contact.
+- **Dedupe:** each company (key: domain) enters once per 90 days; up to 3 contacts per company, owner first, then the
+  general or operations manager (Week 2 result: 15 people at 9 companies, max 3 at one company).
 - **Channel:** email, 3 emails over 10 days in one thread; LinkedIn connection to the GM when found.
 - **Send gates:** C1, C3, C4, C5, C6 send; C2 collects in its own view until a proof point exists.
 
@@ -163,7 +169,7 @@ prices or contract terms.
 
 ## Open items
 1. Done 24 Nov: Clay's job search is free and covers about 2% of small trade contractors (58 of 3,221 with a post in 30 days); trigger widened.
-2. A dispatch proof point (unblocks C3).
+2. A dispatch proof point (unblocks C2).
 3. Facts file, sender, CTA and suppression lists before any copy is sent (`/campaign-copy` builds the facts file).
 
 ---
@@ -173,13 +179,19 @@ prices or contract terms.
 *Written 2026-11-23 with `/campaign-copy` rules (`knowledge-base/playbooks/copy-iron-laws.md`, `copy-bans.yaml`).
 Register: SIGNAL play. Every name and number traces to `context/messaging/facts.md`. Variables only from section 6.
 Dynamic lines resolve in Clay (one clean sentence per row, no spintax); static lines carry spintax. Routing is
-exhaustive (6 cells cover every row), so no fallback is needed; C3 stays on hold until `{{dispatch_proof}}` exists.*
+exhaustive (6 cells cover every row), so no fallback is needed; C2 stays on hold until `{{dispatch_proof}}` exists.*
 
 Line map (E1): L1 the role they posted · L2 technician hiring · L3 value prop · L4 matched proof · L5 CTA.
 
 ### Email 1 (day 0)
 
-**Subject:** {new office hire|the office hire|adding to the office}
+**Subject:** `{{subject}}` (router: cell)
+
+| Cell | Subject (spintax kept in the sequencer) |
+|---|---|
+| C1, C2, C3, C5 (an office role is posted) | {new office hire\|the office hire\|adding to the office} |
+| C4 (technicians only) | {more trucks on the road\|adding technicians} |
+| C6 (other roles) | {the new opening\|growing the team} |
 
 ```
 {{first_name}},
@@ -223,7 +235,7 @@ ServiceTitan {runs|keeps} calls, dispatch, invoices and payroll in one system bu
 | C3 office manager, office only | Adams Power now gets service invoices out in a week and a half to two weeks, versus up to four before. |
 | C4 field only | Young Plumbing went from 4 to 8 trucks in a year on it. |
 | C5 office and field | Vines Restoration went from 400 to 500 abandoned calls a day to slim to none, with 70+ trucks on the road. |
-| C6 other roles | Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max. |
+| C6 other roles | Redding Heating & Air saw their call booking rate rise 30% and their close rate 40% after turning on Max (ServiceTitan's AI package, facts.md). |
 
 QA: passed. insult ok, nexus ok, facts-traced ok, spintax ok (static only), no-cliche ok, no banned words [word count E1: 85 to 99 depending on route, counted with a sample name; under the 120 ceiling, above the 60 optimum: the value line is the one to cut if replies are low]
 

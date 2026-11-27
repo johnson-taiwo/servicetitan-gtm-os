@@ -1,7 +1,7 @@
 # CRM design: ServiceTitan demo request to MQL to deal (Week 3)
 
-**Status:** BUILT AND TESTED 2026-11-27 in Johnson's own HubSpot trial portal (both robots ON). Rules drafted by Claude from
-the Week 1-2 rules; Johnson to review the wording. How each piece was built, click by click: `build-guide.md`.
+**Status:** BUILT AND TESTED 2026-11-27 in my own HubSpot trial portal (both workflows ON). Rules built from the Week 1-2
+rules. How each piece was built, click by click: `build-guide.md`.
 Filled in from Treford's CRM Design Workbook (Part 1, steps 1.1 to 1.6). Every rule reuses a Week 1 or Week 2 rule
 (source named), so the CRM judges a lead exactly the way the outbound list was judged.
 **Teaching case:** ServiceTitan is a public company and this is a portfolio build, not ServiceTitan's real CRM.
@@ -40,7 +40,7 @@ Checked in this order. The first rule that fires sets the answer and the reason.
 | 8 | Everything passed | Meets criteria | "US HQ, <n> staff, <industry>" |
 
 *Why plain formulas:* the reason is always readable, costs nothing, and a teammate can apply the same rule by hand
-(Johnson's build pattern: deterministic before AI). Week 2 used an AI column for fit because outbound lists are messy.
+(my build rule: plain logic before AI). Week 2 used an AI column for fit because outbound lists are messy.
 Inbound has the email domain, so formulas are enough.
 
 ---
@@ -77,9 +77,9 @@ public per-technician price exists. Competitor-published estimates are $245 to $
 are office and management).
 | Number of employees (company) | Branch | Est. technicians | Deal amount (yearly) |
 |---|---|---|---|
-| 10 to 24 | Small | ~10 | $36,000 |
-| 25 to 49 | Mid | ~22 | $80,000 |
-| 50 to 99 | Large | ~45 | $160,000 |
+| 10 to 24 | Small | ~10 | $36,000 (10 x $300 x 12) |
+| 25 to 49 | Mid | ~22 | $80,000 (22 x $300 x 12 = $79,200, rounded) |
+| 50 to 99 | Large | ~45 | $160,000 (45 x $300 x 12 = $162,000, rounded) |
 | Unknown or outside | None met | n/a | No amount + task "Confirm technician count" (never guess) |
 
 ## 1.4 Properties (only the ones a rule or report uses)
@@ -88,7 +88,7 @@ are office and management).
 | ICP fit (contact, `icp_fit`) | Dropdown, exactly: `Meets criteria`, `Doesn't meet criteria`, `Needs review` | Clay only | Robot 1 branches; segment; report |
 | ICP reason (contact, `icp_reason`) | Single-line text | Clay only | Owner alert; audit |
 | Lead channel (contact, `lead_channel`) | Dropdown: `Demo request`, `Outbound - office under pressure` | Form (hidden field) / Clay | Report: which door works |
-| MQL date (contact, `mql_date`, reused from the June build) | Date | Robot 1 | Speed-to-lead report |
+| Date entered MQL (contact, HubSpot default) | Date | HubSpot, automatically when the lifecycle changes to MQL | Speed-to-lead report |
 | Number of employees (company) | Number (HubSpot default) | Clay (company update) | Robot 2 amount |
 | Lifecycle stage, Contact owner, Lead status (contact) | HubSpot defaults | Robots / sales | Stage, ownership |
 | Lost reason (deal, `st_lost_reason`) | Dropdown (list above) | Sales | Loss report |
@@ -98,10 +98,11 @@ are office and management).
 ### Robot 1: Demo request -> MQL (contact-based)
 | Part | Answer |
 |---|---|
-| Trigger | Filled in "ServiceTitan demo request" AND lifecycle is Lead (Customers and later stages never enter) |
+| Trigger | Form submission: "ServiceTitan demo request" (an event trigger, so the right trigger for a form source) |
+| Customer guard | First step branches on lifecycle stage: a Customer goes to an account-manager task and never reaches Clay or the MQL path |
 | Evidence | ICP fit from Clay (sent by webhook with record ID + email) |
 | Wait | Until ICP fit is known, up to 15 minutes |
-| Meets criteria | Lifecycle -> MQL; MQL date = today; owner assigned if empty (never overwritten); call task "Call <first name> about their ServiceTitan demo" due in 1 working day, assigned to owner; internal alert "New MQL: <name>, <company>. Why: <ICP reason>" |
+| Meets criteria | Lifecycle -> MQL (HubSpot stamps the MQL date); owner assigned if empty (never overwritten); call task "Call <first name> about their ServiceTitan demo" due in 1 working day, assigned to owner; internal alert "New MQL: <name>, <company>. Why: <ICP reason>" |
 | Doesn't meet | Lead status = Unqualified; stays Lead; reason saved |
 | Needs review | No action: segment "Needs review" catches it; a person decides |
 | **Failure path (timed out)** | Clay never answered: ICP fit = Needs review is NOT guessed; a task "Clay check didn't come back for <email>" goes to the owner, so nothing fails silently |
@@ -110,26 +111,28 @@ are office and management).
 | Part | Answer |
 |---|---|
 | Trigger | Lifecycle becomes SQL (set by sales by hand) |
-| Guard | Skip if the contact already has an open deal (no duplicate deals) |
+| Owner first | Assign an owner if there is none (never overwrite); added after test 6 |
+| Guard | Skip if the contact already has a deal (no duplicate deals) |
 | Branch | Associated company's Number of employees: 10-24 / 25-49 / 50-99 / none met |
-| Action | Create deal "<Company> - ServiceTitan", pipeline ServiceTitan, stage Discovery held, amount per band, owner = contact owner, associated with contact + company. None met: no amount + task "Confirm technician count" |
+| Action | Create deal "<Company> - ServiceTitan", pipeline ServiceTitan, stage Discovery held, amount per band, owner = contact owner, associated with contact + company. None met: deal named after the person ("<First> <Last> - ServiceTitan (size unknown)"), no amount, + task "Confirm technician count" |
 | Then | Lifecycle -> Opportunity |
 | Re-enrolment | Off |
 ### Existing customer asks for a demo
-Robot 1 doesn't enrol them (trigger requires Lead). The segment "Customers who requested a demo" plus a task to the
-account manager: probably an add-on or a new location, not a new logo.
+Robot 1's first branch catches them: they stay Customer, skip Clay, and the owner gets a task "Existing customer <first
+name> asked for a demo" (probably an add-on or a new location, not a new logo). The segment "Customers who requested a
+demo" lists them.
 
 ## 1.6 Tests (run 27 Nov 2026 through the real form, fake people at real company domains)
 | # | Test | Expected | Actual | Evidence |
 |---|---|---|---|---|
-| 1 | Felix, work email at O'Connor Plumbing (US, 56 staff, plumbing) | Meets; MQL; owner; call task due next working day; alert | ICP fit **Meets criteria**, reason "US HQ, 56 staff, Specialty Trade Contractors"; lifecycle **MQL** (date stamped by HubSpot); owner **Johnson Taiwo**; task **"Call Felix about their ServiceTitan demo"**, type Call, high priority, due **Mon 30 Nov 9:00** (Friday + 1 working day); alert sent | `screenshots/test1-felix-contact-record.png` |
-| 2 | Nora, work email at Salesforce (91,443 staff) | Doesn't meet; Lead; Unqualified; reason saved | ICP fit **Doesn't meet criteria**, reason "91443 staff, outside 10-99"; stays **Lead**; lead status **Unqualified**; no owner, no task | HubSpot record |
+| 1 | Felix, work email at O'Connor Plumbing (US, 56 staff, plumbing) | Meets; MQL; owner; call task due next working day; alert | ICP fit **Meets criteria**, reason "US HQ, 56 staff, Specialty Trade Contractors"; lifecycle **MQL** (date stamped by HubSpot); owner **Johnson Taiwo**; task **"Call Felix about their ServiceTitan demo"**, type Call, high priority, due **Mon 30 Nov 9:00** (Friday + 1 working day); alert sent | `screenshots/test1-felix-icp-fit-properties.png`, `screenshots/test1-felix-contact-record.png` |
+| 2 | Nora, work email at Salesforce (91,443 staff) | Doesn't meet; Lead; Unqualified; reason saved | ICP fit **Doesn't meet criteria**, reason "91443 staff, outside 10-99"; stays **Lead**; lead status **Unqualified**; no owner, no task | `screenshots/test2-nora-unqualified.png` |
 | 3 | Gina, Gmail address | Needs review; Lead; in the review list; no task | ICP fit **Needs review**, reason "Personal email: no company to check"; stays **Lead**; in list "Needs review (ServiceTitan)" | HubSpot list |
-| 4 | Casey, an existing **Customer** at Frey Lutz, fills in the form | Not treated as a new lead; stays Customer | Took the **Customer** branch: stays **Customer**, never sent to Clay; owner set; task **"Existing customer Casey asked for a demo"** (to-do) | HubSpot record |
+| 4 | Casey, a fictional test contact set up as an existing **Customer** (a real trade company's domain is used only so the form has a work email), fills in the form | Not treated as a new lead; stays Customer | Took the **Customer** branch: stays **Customer**, never sent to Clay; owner set; task **"Existing customer Casey asked for a demo"** (to-do) | HubSpot record |
 | 5 | Felix (test 1) set to **SQL** by hand | Deal at Discovery held, amount for 56 staff, associated; contact -> Opportunity | Deal **"O'Connor Plumbing - ServiceTitan"**, **$160,000** (Large band), stage **Discovery held**, pipeline ServiceTitan, owner Johnson, linked to contact and company; contact **Opportunity** | `screenshots/pipeline-servicetitan-board.png` |
 | 6 | Gina (test 3) set to SQL by hand: no company | Size unknown: deal with no amount + task to confirm; Opportunity | Deal created with **no amount** and task **"Confirm technician count for this deal"**; Opportunity. **Two flaws found:** the deal was named " - ServiceTitan" (no company to name it after) and the task had **no owner** (Gina never got one). **Both fixed** the same hour: size-unknown deals are now named after the person, and robot 2 now starts by assigning an owner if there is none (never overwriting one) | robot 2 read back by API |
 
-**Clay credits for all Week 3 tests:** 4 (balance 22,460.2 before, 22,456.2 after).
+**Clay credits for all Week 3 tests:** 4 (read from the workspace balance before and after).
 
 ### What the tests taught
 - A record that skips a stage (Needs review straight to SQL) arrives without an owner. Every robot that creates work

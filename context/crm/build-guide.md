@@ -1,17 +1,19 @@
 # How I built the Week 3 CRM (re-enact it step by step)
 
-*Written as Johnson's own build diary, 27 Nov 2026. Each step has: **why**, **click by click** (how to do it in the
+*My build diary, 27 Nov 2026. Each step has: **why**, **click by click** (how to do it in the
 HubSpot or Clay screens), **what I typed**, **check**, **cost**, and **what went wrong / what I learned**. Some steps
 were done faster through the HubSpot API (noted as "Fast way"); the click path gives the same result.*
 The rules behind every step are in `crm-design.md` (read that first: it says WHAT and WHY, this file says HOW).
 
-**Accounts used:** my own HubSpot (portal "Akison", 48912703, Sales Hub Professional 14-day trial) and my own Clay
-workspace ("Johnson's Workspace", Treford credits). Never an employer's or a client's account.
+**Accounts used:** my own HubSpot (Sales Hub Professional and Data Hub Professional 14-day trials) and my own Clay
+workspace (Treford credits). Never an employer's or a client's account. The HubSpot account also holds an earlier
+personal project of mine (June 2026: a lead-scoring and routing system run through n8n because the free plan had no
+workflows); I left everything from it untouched.
 
 ---
 
 ## Step 0. Turn on the trial and give the key the right permissions
-**Why:** HubSpot's free plan can't run workflows. My June HubSpot build hit exactly this (403 on the workflows API),
+**Why:** HubSpot's free plan can't run workflows. My June project hit exactly this (403 on the workflows API),
 so this time I started the trial first.
 **Click by click:**
 1. HubSpot > left menu > **Workflows** (it shows a lock) > the upgrade page > **Start 14-day trial** (Sales Hub
@@ -39,13 +41,13 @@ the buyer-led pipeline, deal amounts with the logic shown, the properties, both 
 | Lead channel | Dropdown select | Demo request · Outbound - office under pressure | ServiceTitan (Week 3) |
 Then switch to **Deal properties** > Create property > **Lost reason** (dropdown: Price · Staying on current tool ·
 Timing · No decision maker · Went quiet · Not a fit).
-**Reused, not recreated:** `MQL date` (contact, date) already existed from my June lead-management build.
+**Reused, not recreated:** `MQL date` (contact, date) already existed from my June project.
 **Fast way:** `POST /crm/v3/properties/contacts` (and `/deals`) with the same labels and options; a property group
 "ServiceTitan (Week 3)" keeps them together.
 **Check:** open a contact > Actions > View all properties > search "icp": both boxes show.
-**Learned:** my portal already had June boxes (lead_score, outreach_status, a text "lead_source_detail"). I left them
+**Learned:** my account already had boxes from the June project (lead_score, outreach_status, a text "lead_source_detail"). I left them
 alone and made a new dropdown "Lead channel" instead of changing the old text box's type, because changing it would
-break the June build that writes to it.
+break the June project that writes to it.
 
 ## Step 3. Create the ServiceTitan pipeline
 **Why:** a buyer-led pipeline is graded. Every stage is named after what the BUYER did.
@@ -63,7 +65,7 @@ Optional: **Edit stage properties**: Amount required at "Demo and proposal", Los
 **Fast way:** `POST /crm/v3/pipelines/deals` with the six stages and `metadata.probability`.
 **Check:** Deals > pipeline dropdown shows "ServiceTitan" with the six stages.
 **Learned:** currency stays USD (ServiceTitan sells in the US); the class guide set NGN because PaidHR is Nigerian.
-On the free plan only one pipeline is allowed (my June build hit that); the trial allows more.
+On the free plan only one pipeline is allowed (my June project hit that); the trial allows more.
 
 ## Step 4. Create the lists (segments)
 **Why:** "Needs review" is how a person catches what the robot can't decide. The second list is my own
@@ -117,8 +119,8 @@ went nowhere until that column existed.
 **Why:** "A value in a Clay column doesn't mean HubSpot has it" (Lola). The write-back is where most people got stuck.
 **Click by click:**
 1. Clay > Settings > **Connections** > **Create** > search HubSpot > pick **HubSpot** (NOT "HubSpot (enrich-only)") >
-   **Sign in with HubSpot** > choose the account **Akison** > **Choose Account** > tick the terms box > **Connect app**
-   > name it `Johnson HubSpot (Akison, course)` > **Save**.
+   **Sign in with HubSpot** > choose my bootcamp account > **Choose Account** > tick the terms box > **Connect app**
+   > give the connection a clear name > **Save**.
 2. In the table: **Add enrichment** > HubSpot **Update object** (not "Update record", which is Salesforce):
    Account = my connection, Object Type = **Contact**, HubSpot Object ID = **HubSpot Record ID**, Ignore blank values
    ON, Map fields: **ICP fit** <- ICP Fit, **ICP reason** <- ICP Reason. Run only if the Record ID is filled.
@@ -142,9 +144,8 @@ lock: it belongs to **Data Hub Professional**. The class guide doesn't say this.
 
 ## Step 9. Robot 1: "ServiceTitan - 1. Demo request to MQL"
 **Why:** the graded part. A contact's stage changes because a rule says so, someone owns it, and there's a next step.
-**How it was built:** I learned HubSpot's exact format for each step by adding it once in a test workflow (deleted
-after), then created robot 1 through the workflows API, then opened it in the editor to check every step shows without
-errors. Click path to rebuild it by hand:
+**How it was built:** I added each step once in a test workflow (deleted after) to read HubSpot's exact format, created
+workflow 1 through the workflows API, then opened it in the editor to check every step. Click path to rebuild it by hand:
 1. Automation > **Workflows** > **Create workflow** > **From scratch** > Contact-based. Name it.
 2. **Trigger:** "When an event occurs" > **Form submission** > form is **ServiceTitan demo request**. Re-enroll **off**.
 3. **+ Branch** > "One property or action output" > **Lifecycle stage**: branch **= Customer** (existing-customer guard:
@@ -164,7 +165,7 @@ errors. Click path to rebuild it by hand:
    - **Needs review:** nothing (the "Needs review" list catches it).
    - **Clay did not answer:** rotate owner > task "Clay check didn't come back for {email}" (fail loud, never silent).
 7. **Review and turn on**.
-**Check:** `screenshots/robot1-demo-request-to-mql.png`. Read back by API: ON, 14 steps, start = customer guard.
+**Check:** `screenshots/robot1-demo-request-to-mql.png`; per-contact evidence in `test1-felix-icp-fit-properties.png` and `test2-nora-unqualified.png` (record > Actions > View all properties > search "icp"). Read back by API: ON, 14 steps, start = customer guard.
 **Learned:** the MQL date is stamped by HubSpot itself ("Date entered Marketing Qualified Lead") when the lifecycle
 changes, so no custom date step is needed. Tokens look like `{{ enrolled_object.firstname }}`.
 
@@ -188,7 +189,7 @@ changes, so no custom date step is needed. Tokens look like `{{ enrolled_object.
 5. **Size unknown:** Create record > Deal with **no amount** (named after the person) > **Create task** "Confirm
    technician count for this deal" (due 1 business day, to the contact owner) > Lifecycle = Opportunity.
 6. **Review and turn on** > choose **"No, only enroll contacts who meet the criteria after the workflow is turned on"**
-   (my June demo contacts must not get deals) > **Skip to turn on** > **Turn on workflow**.
+   (contacts from the June project must not get deals) > **Skip to turn on** > **Turn on workflow**.
 **Check:** `screenshots/robot2-sql-to-deal.png`; test 5 made "O'Connor Plumbing - ServiceTitan" at $160,000.
 **What went wrong:** HubSpot twice showed "Something went wrong while updating your workflow" on Save; saving again
 worked. Clicking a category ("CRM") in the action list toggles it closed if it's already open.
@@ -217,6 +218,6 @@ builder.)
 | Demo requests by lifecycle stage | How many moved forward, and where are they now? | Same contacts, by Lifecycle stage | 1 Lead, 2 Opportunity, 1 Customer |
 | ServiceTitan pipeline by stage | What is in the pipeline, and where? | Deals in the ServiceTitan pipeline, by Deal stage, sum of Amount + count | Discovery held: 2 deals, $160,000 |
 **Check:** each AI-made report was compared against the test table in `crm-design.md` 1.6 before saving: every number
-matched. `screenshots/dashboard-servicetitan-week3.png`.
+matched. `screenshots/dashboard-servicetitan-week3.png` and `screenshots/dashboard-pipeline-report.png`.
 **Learned:** Breeze filters on the property you name ("Lead channel is Demo request") correctly; always read its filter
 and the bars against a record you know before trusting it.
