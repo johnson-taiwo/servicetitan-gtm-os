@@ -203,3 +203,20 @@ two contacts to SQL by hand, the way a rep would. Polled HubSpot until each cont
   default permissions, **Send an email invite** ticked > **Add a user**. Shows as 1 Pending until she accepts.
 - Deleted my test workflow ("ZZ probe") and the write-back test contact. Kept the 4 test contacts and 2 test deals as
   evidence; the second deal was renamed "Gina (W3 test) - ServiceTitan (size unknown)".
+
+## Step 13. Dashboard "ServiceTitan - Week 3 CRM" (reports that answer a question)
+**Why:** a report should answer a question, not just count things (class guide, Part 5).
+**Click by click:** Reporting > Dashboards > dashboard name dropdown > **New dashboard** > **New dashboard** (from scratch)
+> name `ServiceTitan - Week 3 CRM`, "Allow everyone to view" > **Create dashboard**. Then for each report: **Add content**
+> **Create report with AI** (Breeze), type what you want, check the chart and its filter, **Save** > describe it > **Add to
+existing dashboard** > pick the dashboard > **Save & add**. (The same reports can be built by hand in the custom report
+builder.)
+| Report | Question it answers | Filter / grouping | Result on test data |
+|---|---|---|---|
+| Demo requests by ICP fit | Is the rule letting the right people through? | Contacts, Lead channel = Demo request, by ICP fit | 1 Meets, 1 Doesn't meet, 1 Needs review, 1 no value (the existing customer, who skips Clay by design) |
+| Demo requests by lifecycle stage | How many moved forward, and where are they now? | Same contacts, by Lifecycle stage | 1 Lead, 2 Opportunity, 1 Customer |
+| ServiceTitan pipeline by stage | What is in the pipeline, and where? | Deals in the ServiceTitan pipeline, by Deal stage, sum of Amount + count | Discovery held: 2 deals, $160,000 |
+**Check:** each AI-made report was compared against the test table in `crm-design.md` 1.6 before saving: every number
+matched. `screenshots/dashboard-servicetitan-week3.png`.
+**Learned:** Breeze filters on the property you name ("Lead channel is Demo request") correctly; always read its filter
+and the bars against a record you know before trusting it.
