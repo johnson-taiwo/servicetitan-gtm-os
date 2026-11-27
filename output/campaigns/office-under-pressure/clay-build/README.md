@@ -1,6 +1,6 @@
 # Week 2 Clay build: Office Under Pressure
 
-**Clay workbook (view access):** https://app.clay.com/workspaces/736170/workbooks/wb_0tp15rlsUJYKZbuDF4W
+**Clay workbook (shared link, opens for any Clay user):** https://app.clay.com/shared-workbook/share_0tp65ngvN55JHo3cbhk
 Workbook "ServiceTitan | Contractors Hiring | 24 Nov 2026", 9 tables: 01 Exclusions · 02 Hiring Contractors (main) ·
 03-07 signal searches (phones, dispatch, office manager, technicians, "ServiceTitan" in a job post) · 08 Owners ·
 09 Demo requests (Week 3: the HubSpot fit check).
