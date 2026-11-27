@@ -13,6 +13,7 @@ contractors with 10 to 99 employees, adding technicians or a location, still on 
 - `context/messaging/` core message, pillars, facts copy may use. Read before writing copy.
 - `context/brand-kit/` tone of voice and key phrases. Read before writing copy.
 - `context/docs/` GTM system architecture and case studies. Read before designing a workflow.
+- `context/crm/` CRM rules, lifecycle and pipeline definitions, workflow logic and tests. Read before touching HubSpot.
 - `knowledge-base/playbooks/` method docs the skills read. Read when a skill points to them.
 - `knowledge-base/learnings/` what worked and what didn't. Add a note after every build.
 - `meetings/` call and class notes, one file per meeting.
@@ -35,6 +36,7 @@ contractors with 10 to 99 employees, adding technicians or a location, still on 
 - ICP: `context/icp/icp.md` (five layers, segments S1-S4, not a fit, challenge pass), `personas.md` (champion, owner, influencer),
   `signal-matrix.md` (segments x personas, signals scored on four tests, tracker)
 - System: `context/docs/gtm-system.md` (signal to CRM, tools, decisions, feedback loop)
+- CRM (Week 3): `context/crm/crm-design.md` (motion, fit vs intent, fit rule, lifecycle, buyer-led pipeline, deal amounts, properties, both workflows in plain words, test results), `context/crm/build-guide.md` (how it was built, click by click), `context/crm/screenshots/` (test data only)
 - Workflows: `output/campaigns/workflow-candidates.md`, `campaign-strategy.md`; `output/campaigns/office-under-pressure/workflow-spec.md`
   (trigger widened 24 Nov) and its Clay build plan in `clay-build/` (guide, flow diagram; exclusions.csv stays local)
 - This week: `weekly-priorities/2026-W48.md`, `work-log/2026-W48.md`
